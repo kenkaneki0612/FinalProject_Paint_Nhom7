@@ -1,0 +1,114 @@
+package shapes;
+
+import java.awt.Color;
+import java.awt.Graphics;
+
+	//Class that represent square shape.
+public class Square extends SurfaceShape {
+	private static final long serialVersionUID = 1L;
+	protected Point upLeft;
+    protected int side;
+
+    public Square() {}
+
+    public Square(Point upLeft, int side) {
+        this.upLeft = upLeft;
+        this.side = side;
+    }
+
+    public Square(Point upLeft, int side, Color edgeColor, Color interiorColor) {
+        this(upLeft, side);
+        setColor(edgeColor);
+        setInteriorColor(interiorColor);
+    }
+    
+    //Draw square.
+    public void draw(Graphics graphics) {
+        graphics.setColor(getColor());
+        graphics.drawRect(upLeft.getXcoordinate(), upLeft.getYcoordinate(), side, side);
+        fillUpShape(graphics);
+        if (isSelected()) selected(graphics);
+    }
+    
+    //Check if two squares are equal depend on their up left points and side lengths.
+    @Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Square) {
+			Square square = (Square) obj;
+			return upLeft.equals(square.upLeft) && side == square.side;
+		}
+		return false;
+	}
+    
+    //Compares two squares depend on their surface.
+    @Override
+	public int compareTo(Shape shape) {
+		if (shape instanceof Square) return surface() - ((Square) shape).surface();
+		return 0;
+	}
+
+    //Print square values.
+    @Override
+    public String toString() {
+        return "Square: x=" + upLeft.getXcoordinate() + "; y=" + upLeft.getYcoordinate() 
+        + "; side=" + side + "; edge color=" + getColor().toString().substring(14).replace('=', '-') + "; area color=" 
+        		+ getInteriorColor().toString().substring(14).replace('=', '-');
+    }
+
+    //Move up left point of square to forwarded coordinates.
+    public void moveTo(int x, int y) {
+        upLeft.moveTo(x, y);
+    }
+    
+    //Select square.
+    public void selected(Graphics graphics) {
+        graphics.setColor(Color.BLUE);
+        new Line(getUpLeft(), new Point(upLeft.getXcoordinate() + side, upLeft.getYcoordinate())).selected(graphics);
+        new Line(upLeft, new Point(upLeft.getXcoordinate(), upLeft.getYcoordinate() + side)).selected(graphics);
+        new Line(new Point(upLeft.getXcoordinate() + side, upLeft.getYcoordinate()), diagonal().getLast()).selected(graphics);
+        new Line(new Point(upLeft.getXcoordinate(), upLeft.getYcoordinate() + side), diagonal().getLast()).selected(graphics);
+    }
+    
+    //Check if this square contains user click.
+    public boolean containsClick(int x, int y) {
+        if (this.getUpLeft().getXcoordinate() <= x && x <= (this.getUpLeft().getXcoordinate() + side) && this.getUpLeft().getYcoordinate() <= y && y <= (this.getUpLeft().getYcoordinate() + side)) return true;
+        return false;
+    }
+    
+    //Create new instance of this square.
+    public Square clone() {
+    	return new Square(upLeft.clone(), side, getColor(), getInteriorColor());
+    }
+    
+    //Fill up square.
+    public void fillUpShape(Graphics graphics) {
+        graphics.setColor(getInteriorColor());
+        graphics.fillRect(upLeft.getXcoordinate() + 1, upLeft.getYcoordinate() + 1, side - 1, side - 1);
+    }
+    
+    //Calculate surface of square.
+    public int surface() {
+        return side * side;
+    }
+
+    //Calculate diagonal of square.
+    public Line diagonal() {
+        return new Line(upLeft, new Point(upLeft.getXcoordinate() + side, upLeft.getYcoordinate() + side));
+    }
+
+    public Point getUpLeft() {
+        return upLeft;
+    }
+
+    public void setUpLeft(Point upLeft) {
+        this.upLeft = upLeft;
+    }
+
+    public int getSide() {
+        return side;
+    }
+
+    public void setSide(int side) {
+        this.side = side;
+    }
+}
